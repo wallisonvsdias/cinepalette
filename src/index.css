@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cine-dark: #0d0d0d;
+  --color-cine-gold: #eab308;
+  --color-cine-gray: #1f1f1f;
+}
+
+@layer base {
+  body {
+    @apply bg-cine-dark text-white antialiased;
+  }
+}
