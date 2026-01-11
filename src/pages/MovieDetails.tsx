@@ -59,11 +59,11 @@ export function MovieDetails() {
       {/* Hero Section */}
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-10 px-4 pt-20 pb-10 md:flex-row md:items-start">
         {/* Poster Image (Source of Color) */}
-        <div className="relative w-64 shrink-0 rotate-3 transform overflow-hidden rounded-xl shadow-2xl shadow-black/50 transition-transform duration-500 hover:rotate-0 md:w-80">
+        <div className="relative w-64 shrink-0 overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-black/60 md:w-80">
           <img
             src={`${getImageUrl(movie.poster_path)}?param=cors`}
             alt={movie.title}
-            crossOrigin="anonymous" // CRITICAL for color extraction
+            crossOrigin="anonymous"
             onLoad={handleImageLoad}
             className="h-auto w-full object-cover"
           />
