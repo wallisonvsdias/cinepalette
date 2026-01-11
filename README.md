@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# 🎬 CinePalette
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> **Discover movies through aesthetics and vibes.**
 
-Currently, two official plugins are available:
+![Project Banner](https://via.placeholder.com/1200x400/0d0d0d/eab308?text=CinePalette+Preview) 
+CinePalette is a modern movie discovery application that moves beyond standard genres. It allows users to find films based on "Vibes" (Aesthetics) and features a dynamic UI that adapts its color palette based on the movie poster being viewed.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Built with the latest web standards of 2026, including **Tailwind CSS v4** and **React 19**.
 
-## React Compiler
+## ✨ Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-   **🎨 Dynamic Color Extraction:** The interface physically changes color based on the dominant color of the movie poster using advanced canvas analysis.
+-   **mood / Vibe Engine:** A curated discovery engine that maps abstract feelings (e.g., "Neon", "Vintage", "Dreamy") to complex TMDB queries.
+-   **⚡ High Performance:** Implements `useDebounce` hooks for search and optimistic UI updates with Skeleton Loaders.
+-   **📱 Fully Responsive:** Adaptive Grid Layout that works perfectly from Mobile to 4K Desktops.
+-   **♾️ Smart Pagination:** "Load More" functionality that seamlessly appends data without layout shifts.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+-   **Core:** React 19 (Vite), TypeScript
+-   **Styling:** Tailwind CSS v4 (using the new CSS-first configuration)
+-   **Data:** TMDB API (The Movie Database)
+-   **State & Effects:** Custom Hooks (`useDebounce`)
+-   **Routing:** React Router DOM v7
+-   **Utils:** Fast Average Color (for image analysis), Lucide React (Icons)
+-   **Code Quality:** ESLint (Flat Config), Prettier
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+You need a **TMDB API Key** (It's free).
+1. Go to [The Movie DB](https://www.themoviedb.org/).
+2. Sign up and request an API Key.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Installation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/your-username/cinepalette.git](https://github.com/your-username/cinepalette.git)
+    cd cinepalette
+    ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Setup Environment Variables**
+    Create a `.env` file in the root directory:
+    ```env
+    VITE_API_KEY=your_tmdb_api_key_here
+    VITE_API_BASE_URL=[https://api.themoviedb.org/3](https://api.themoviedb.org/3)
+    ```
+
+4.  **Run the project**
+    ```bash
+    npm run dev
+    ```
+
+## 📂 Project Structure
+
+```text
+src/
+├── components/      # UI & Feature Components (VibeSelector, MovieCard)
+├── hooks/           # Custom Hooks (useDebounce)
+├── pages/           # Page Views (Home, MovieDetails)
+├── services/        # Axios & API Configuration
+├── types/           # TypeScript Interfaces
+└── utils/           # Helper functions (vibes.ts, imageHelper.ts)
