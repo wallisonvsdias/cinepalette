@@ -1,49 +1,88 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { Loader2 } from 'lucide-react';
 import api from '../services/api';
 import type { Movie } from '../types/movie';
 import { MovieCard } from '../components/MovieCard';
+import { SkeletonCard } from '../components/SkeletonCard';
 import { SearchBar } from '../components/SearchBar';
 import { VibeSelector } from '../components/VibeSelector';
 import { useDebounce } from '../hooks/useDebounce';
 
 export function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenreId, setSelectedGenreId] = useState<number | null>(null);
+  const [page, setPage] = useState(1); // Track current page
 
   const debouncedSearch = useDebounce(searchTerm, 500);
 
+  // Helper function to determine Endpoint and Params
+  const getFetchConfig = useCallback(
+    (pageNumber: number, search: string, genre: number | null) => {
+      let endpoint = '/movie/popular';
+      let params: Record<string, any> = { page: pageNumber }; // Always send page
+
+      if (search) {
+        endpoint = '/search/movie';
+        params = { ...params, query: search };
+      } else if (genre) {
+        endpoint = '/discover/movie';
+        params = { ...params, with_genres: genre };
+      }
+
+      return { endpoint, params };
+    },
+    [],
+  );
+
+  // EFFECT 1: Handle Search or Filter Change (RESET list)
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchInitialData = async () => {
+      setIsLoading(true);
+      setPage(1); // Reset page to 1
       try {
-        let endpoint = '/movie/popular';
-        let params: Record<string, any> = {};
-
-        // Priority 1: Search (Overrides filters)
-        if (debouncedSearch) {
-          endpoint = '/search/movie';
-          params = { query: debouncedSearch };
-        }
-        // Priority 2: Vibe Filter (Discovery)
-        else if (selectedGenreId) {
-          endpoint = '/discover/movie';
-          params = { with_genres: selectedGenreId };
-        }
-
+        const { endpoint, params } = getFetchConfig(
+          1,
+          debouncedSearch,
+          selectedGenreId,
+        );
         const response = await api.get(endpoint, { params });
         setMovies(response.data.results);
       } catch (error) {
-        console.error('Error fetching movies:', error);
+        console.error('Error fetching initial movies:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchMovies();
-  }, [debouncedSearch, selectedGenreId]); // Re-run when these change
+    fetchInitialData();
+  }, [debouncedSearch, selectedGenreId, getFetchConfig]);
 
-  // Handler to clear search when selecting a vibe (optional UX improvement)
-  const handleVibeSelect = (id: number | null) => {
-    setSelectedGenreId(id);
-    if (id) setSearchTerm(''); // Clear search if a vibe is clicked
+  // FUNCTION: Handle "Load More" Click (APPEND to list)
+  const handleLoadMore = async () => {
+    if (isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    const nextPage = page + 1;
+
+    try {
+      const { endpoint, params } = getFetchConfig(
+        nextPage,
+        debouncedSearch,
+        selectedGenreId,
+      );
+      const response = await api.get(endpoint, { params });
+
+      // The Magic: Combine old movies + new movies
+      setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
+      setPage(nextPage);
+    } catch (error) {
+      console.error('Error loading more movies:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   return (
@@ -58,27 +97,51 @@ export function Home() {
           </p>
         </header>
 
-        {/* Search */}
         <SearchBar value={searchTerm} onChange={setSearchTerm} />
 
-        {/* Vibe Filter (Only show if not searching to keep UI clean) */}
         {!searchTerm && (
           <VibeSelector
             selectedGenreId={selectedGenreId}
-            onSelect={handleVibeSelect}
+            onSelect={(id) => {
+              setSelectedGenreId(id);
+              if (id) setSearchTerm('');
+            }}
           />
         )}
 
-        {/* Results Grid */}
-        {movies.length > 0 ? (
-          <div className="animate-fade-in grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {movies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
-          </div>
-        ) : (
+        {/* Main Grid */}
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {isLoading
+            ? Array.from({ length: 10 }).map((_, index) => (
+                <SkeletonCard key={index} />
+              ))
+            : movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
+        </div>
+
+        {/* Empty State */}
+        {!isLoading && movies.length === 0 && (
           <div className="mt-20 text-center text-gray-500">
             <p className="text-xl">No movies found.</p>
+          </div>
+        )}
+
+        {/* LOAD MORE BUTTON */}
+        {!isLoading && movies.length > 0 && (
+          <div className="mt-12 flex justify-center">
+            <button
+              onClick={handleLoadMore}
+              disabled={isLoadingMore}
+              className="bg-cine-gray hover:bg-cine-gold flex items-center gap-2 rounded-full px-8 py-3 font-bold text-white transition-all duration-300 hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLoadingMore ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                'Load More Movies'
+              )}
+            </button>
           </div>
         )}
       </div>
