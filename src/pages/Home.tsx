@@ -6,8 +6,9 @@ import { MovieCard } from '../components/MovieCard';
 import { SkeletonCard } from '../components/SkeletonCard';
 import { SearchBar } from '../components/SearchBar';
 import { VibeSelector } from '../components/VibeSelector';
-import type { Vibe } from '../utils/vibes'; // FIX 1: Importamos apenas o TIPO, não a lista
+import type { Vibe } from '../utils/vibes';
 import { useDebounce } from '../hooks/useDebounce';
+import { Footer } from '../components/Footer';
 
 export function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -15,14 +16,12 @@ export function Home() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // FIX 2: Removemos selectedGenreId. Agora só existe selectedVibe.
   const [selectedVibe, setSelectedVibe] = useState<Vibe | null>(null);
 
   const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebounce(searchTerm, 500);
 
-  // Lógica de busca unificada
   const getFetchConfig = useCallback(
     (pageNumber: number, search: string, vibe: Vibe | null) => {
       let endpoint = '/movie/popular';
@@ -45,7 +44,6 @@ export function Home() {
     [],
   );
 
-  // Efeito principal (Busca inicial ou troca de filtro)
   useEffect(() => {
     const fetchInitialData = async () => {
       setIsLoading(true);
@@ -68,7 +66,6 @@ export function Home() {
     fetchInitialData();
   }, [debouncedSearch, selectedVibe, getFetchConfig]);
 
-  // Função "Carregar Mais"
   const handleLoadMore = async () => {
     if (isLoadingMore) return;
     setIsLoadingMore(true);
@@ -94,8 +91,15 @@ export function Home() {
     <div className="bg-cine-dark min-h-screen px-4 py-10 text-white md:px-8">
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-extrabold text-white drop-shadow-md md:text-5xl">
-            Cine<span className="text-cine-gold">Palette</span>
+          <h1 className="mb-2 flex items-center justify-center gap-3 text-4xl font-extrabold text-white drop-shadow-md md:text-5xl">
+            <img
+              src="/favicon.jpg"
+              alt="CinePalette Logo"
+              className="h-10 w-10 rounded-md object-cover md:h-12 md:w-12"
+            />
+            <span>
+              Cine<span className="text-cine-gold">Palette</span>
+            </span>
           </h1>
           <p className="text-lg text-gray-400">
             Discover movies through aesthetics and vibes.
@@ -104,7 +108,6 @@ export function Home() {
 
         <SearchBar value={searchTerm} onChange={setSearchTerm} />
 
-        {/* Seletor de Vibes */}
         {!searchTerm && (
           <VibeSelector
             selectedVibeId={selectedVibe?.id || null}
@@ -116,7 +119,6 @@ export function Home() {
           />
         )}
 
-        {/* Grid de Filmes */}
         <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {isLoading
             ? Array.from({ length: 10 }).map((_, index) => (
@@ -125,14 +127,12 @@ export function Home() {
             : movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
         </div>
 
-        {/* Empty State */}
         {!isLoading && movies.length === 0 && (
           <div className="mt-20 text-center text-gray-500">
             <p className="text-xl">No movies found.</p>
           </div>
         )}
 
-        {/* Botão Load More */}
         {!isLoading && movies.length > 0 && (
           <div className="mt-12 flex justify-center">
             <button
@@ -151,6 +151,7 @@ export function Home() {
             </button>
           </div>
         )}
+        <Footer />
       </div>
     </div>
   );
