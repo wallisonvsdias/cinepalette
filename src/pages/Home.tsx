@@ -6,6 +6,7 @@ import { MovieCard } from '../components/MovieCard';
 import { SkeletonCard } from '../components/SkeletonCard';
 import { SearchBar } from '../components/SearchBar';
 import { VibeSelector } from '../components/VibeSelector';
+import type { Vibe } from '../utils/vibes'; // FIX 1: Importamos apenas o TIPO, não a lista
 import { useDebounce } from '../hooks/useDebounce';
 
 export function Home() {
@@ -13,23 +14,30 @@ export function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGenreId, setSelectedGenreId] = useState<number | null>(null);
-  const [page, setPage] = useState(1); // Track current page
+
+  // FIX 2: Removemos selectedGenreId. Agora só existe selectedVibe.
+  const [selectedVibe, setSelectedVibe] = useState<Vibe | null>(null);
+
+  const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebounce(searchTerm, 500);
 
-  // Helper function to determine Endpoint and Params
+  // Lógica de busca unificada
   const getFetchConfig = useCallback(
-    (pageNumber: number, search: string, genre: number | null) => {
+    (pageNumber: number, search: string, vibe: Vibe | null) => {
       let endpoint = '/movie/popular';
-      let params: Record<string, any> = { page: pageNumber }; // Always send page
+      let params: Record<string, any> = {
+        page: pageNumber,
+        language: 'en-US',
+        include_adult: false,
+      };
 
       if (search) {
         endpoint = '/search/movie';
         params = { ...params, query: search };
-      } else if (genre) {
+      } else if (vibe) {
         endpoint = '/discover/movie';
-        params = { ...params, with_genres: genre };
+        params = { ...params, ...vibe.params };
       }
 
       return { endpoint, params };
@@ -37,16 +45,16 @@ export function Home() {
     [],
   );
 
-  // EFFECT 1: Handle Search or Filter Change (RESET list)
+  // Efeito principal (Busca inicial ou troca de filtro)
   useEffect(() => {
     const fetchInitialData = async () => {
       setIsLoading(true);
-      setPage(1); // Reset page to 1
+      setPage(1);
       try {
         const { endpoint, params } = getFetchConfig(
           1,
           debouncedSearch,
-          selectedGenreId,
+          selectedVibe,
         );
         const response = await api.get(endpoint, { params });
         setMovies(response.data.results);
@@ -58,12 +66,11 @@ export function Home() {
     };
 
     fetchInitialData();
-  }, [debouncedSearch, selectedGenreId, getFetchConfig]);
+  }, [debouncedSearch, selectedVibe, getFetchConfig]);
 
-  // FUNCTION: Handle "Load More" Click (APPEND to list)
+  // Função "Carregar Mais"
   const handleLoadMore = async () => {
     if (isLoadingMore) return;
-
     setIsLoadingMore(true);
     const nextPage = page + 1;
 
@@ -71,15 +78,13 @@ export function Home() {
       const { endpoint, params } = getFetchConfig(
         nextPage,
         debouncedSearch,
-        selectedGenreId,
+        selectedVibe,
       );
       const response = await api.get(endpoint, { params });
-
-      // The Magic: Combine old movies + new movies
-      setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
+      setMovies((prev) => [...prev, ...response.data.results]);
       setPage(nextPage);
     } catch (error) {
-      console.error('Error loading more movies:', error);
+      console.error('Error loading more:', error);
     } finally {
       setIsLoadingMore(false);
     }
@@ -99,18 +104,20 @@ export function Home() {
 
         <SearchBar value={searchTerm} onChange={setSearchTerm} />
 
+        {/* Seletor de Vibes */}
         {!searchTerm && (
           <VibeSelector
-            selectedGenreId={selectedGenreId}
-            onSelect={(id) => {
-              setSelectedGenreId(id);
-              if (id) setSearchTerm('');
+            selectedVibeId={selectedVibe?.id || null}
+            onSelect={(vibe) => {
+              setSelectedVibe(vibe);
+              // Opcional: Limpar busca se clicar numa vibe, embora o IF acima já esconda
+              if (vibe) setSearchTerm('');
             }}
           />
         )}
 
-        {/* Main Grid */}
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        {/* Grid de Filmes */}
+        <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {isLoading
             ? Array.from({ length: 10 }).map((_, index) => (
                 <SkeletonCard key={index} />
@@ -125,7 +132,7 @@ export function Home() {
           </div>
         )}
 
-        {/* LOAD MORE BUTTON */}
+        {/* Botão Load More */}
         {!isLoading && movies.length > 0 && (
           <div className="mt-12 flex justify-center">
             <button

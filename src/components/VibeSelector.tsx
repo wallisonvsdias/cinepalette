@@ -1,47 +1,48 @@
-import { VIBES } from '../utils/vibes';
+import { VIBES, type Vibe } from '../utils/vibes';
 
 interface VibeSelectorProps {
-  selectedGenreId: number | null;
-  onSelect: (genreId: number | null) => void;
+  selectedVibeId: string | null;
+  onSelect: (vibe: Vibe | null) => void;
 }
 
-export function VibeSelector({ selectedGenreId, onSelect }: VibeSelectorProps) {
+export function VibeSelector({ selectedVibeId, onSelect }: VibeSelectorProps) {
   return (
     <div className="scrollbar-hide w-full overflow-x-auto pb-6">
       <div className="flex min-w-max justify-start gap-4 px-2 md:justify-center">
-        {/* 'All' Button to clear filters */}
+        {/* Reset Button */}
         <button
           onClick={() => onSelect(null)}
           className={`rounded-full border px-6 py-2 text-sm font-bold transition-all duration-300 ${
-            selectedGenreId === null
-              ? 'text-cine-dark border-white bg-white'
+            selectedVibeId === null
+              ? 'text-cine-dark scale-105 border-white bg-white'
               : 'border-gray-700 bg-transparent text-gray-400 hover:border-gray-500'
           }`}
         >
-          All Vibes
+          All Movies
         </button>
 
-        {/* Dynamic Vibe Buttons */}
+        {/* Vibe Buttons */}
         {VIBES.map((vibe) => {
-          const isSelected = selectedGenreId === vibe.genreId;
+          const isSelected = selectedVibeId === vibe.id;
 
           return (
             <button
               key={vibe.id}
-              onClick={() => onSelect(isSelected ? null : vibe.genreId)}
+              onClick={() => onSelect(isSelected ? null : vibe)}
               className={`group relative overflow-hidden rounded-full border px-6 py-2 text-sm font-bold transition-all duration-300 ${
                 isSelected
-                  ? 'border-transparent text-white'
+                  ? 'scale-105 border-transparent text-white ring-2 ring-white/20'
                   : 'border-gray-700 bg-transparent text-gray-400 hover:border-gray-500 hover:text-white'
               }`}
             >
-              {/* Background Color Animation */}
+              {/* Dynamic Background with Glow Effect */}
               <div
                 className={`absolute inset-0 opacity-20 transition-opacity duration-300 ${vibe.color} ${isSelected ? 'opacity-100' : 'group-hover:opacity-40'}`}
               />
 
-              {/* Text acts as a layer above the background */}
-              <span className="relative z-10">{vibe.label}</span>
+              <span className="relative z-10 flex items-center gap-2">
+                {vibe.label}
+              </span>
             </button>
           );
         })}
