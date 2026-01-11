@@ -2,20 +2,19 @@
 
 > **Discover movies through aesthetics and vibes.**
 
-![Project Banner](https://via.placeholder.com/1200x400/0d0d0d/eab308?text=CinePalette+Preview) 
 CinePalette is a modern movie discovery application that moves beyond standard genres. It allows users to find films based on "Vibes" (Aesthetics) and features a dynamic UI that adapts its color palette based on the movie poster being viewed.
 
 Built with the latest web standards of 2026, including **Tailwind CSS v4** and **React 19**.
 
-## ✨ Key Features
+## Key Features
 
--   **🎨 Dynamic Color Extraction:** The interface physically changes color based on the dominant color of the movie poster using advanced canvas analysis.
--   **mood / Vibe Engine:** A curated discovery engine that maps abstract feelings (e.g., "Neon", "Vintage", "Dreamy") to complex TMDB queries.
--   **⚡ High Performance:** Implements `useDebounce` hooks for search and optimistic UI updates with Skeleton Loaders.
--   **📱 Fully Responsive:** Adaptive Grid Layout that works perfectly from Mobile to 4K Desktops.
--   **♾️ Smart Pagination:** "Load More" functionality that seamlessly appends data without layout shifts.
+-   **Dynamic Color Extraction:** The interface physically changes color based on the dominant color of the movie poster using advanced canvas analysis.
+-   **Mood / Vibe Engine:** A curated discovery engine that maps abstract feelings (e.g., "Neon", "Vintage", "Dreamy") to complex TMDB queries.
+-   **High Performance:** Implements `useDebounce` hooks for search and optimistic UI updates with Skeleton Loaders.
+-   **Fully Responsive:** Adaptive Grid Layout that works perfectly from Mobile to 4K Desktops.
+-   **Smart Pagination:** "Load More" functionality that seamlessly appends data without layout shifts.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 -   **Core:** React 19 (Vite), TypeScript
 -   **Styling:** Tailwind CSS v4 (using the new CSS-first configuration)
@@ -25,11 +24,11 @@ Built with the latest web standards of 2026, including **Tailwind CSS v4** and *
 -   **Utils:** Fast Average Color (for image analysis), Lucide React (Icons)
 -   **Code Quality:** ESLint (Flat Config), Prettier
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-You need a **TMDB API Key** (It's free).
+You need a TMDB API Key (It's free).
 1. Go to [The Movie DB](https://www.themoviedb.org/).
 2. Sign up and request an API Key.
 
@@ -37,7 +36,7 @@ You need a **TMDB API Key** (It's free).
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/your-username/cinepalette.git](https://github.com/your-username/cinepalette.git)
+    git clone https://github.com/wallisonvsdias/cinepalette.git
     cd cinepalette
     ```
 
@@ -58,7 +57,7 @@ You need a **TMDB API Key** (It's free).
     npm run dev
     ```
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 src/
