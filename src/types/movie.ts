@@ -15,3 +15,10 @@ export interface MovieResponse {
   total_pages: number;
   total_results: number;
 }
+
+export interface MovieDetails extends Movie {
+  runtime: number;
+  status: string;
+  genres: { id: number; name: string }[];
+  tagline: string;
+}
